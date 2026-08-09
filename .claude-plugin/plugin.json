@@ -1,0 +1,5 @@
+{
+  "name": "cc-notify",
+  "description": "监控 Claude Code 会话状态（等待审批/运行中/完成/异常），通过 macOS 菜单栏和系统通知提醒",
+  "version": "0.1.0"
+}
