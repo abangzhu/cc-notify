@@ -1,7 +1,10 @@
+const path = require('path')
+const { execFile } = require('child_process')
 const { app, Tray, Menu, nativeImage } = require('electron')
 const { createEventServer, PORT } = require('./server')
 const { applyEvent, aggregateStatus } = require('./sessions')
 const { sendSystemNotification } = require('./notifier')
+const { BUNDLE_ID_BY_TERM_PROGRAM } = require('./terminalBundles')
 
 let sessions = {}
 let tray = null
@@ -15,7 +18,24 @@ const STATUS_LABEL = {
   notification: '🔔 通知',
 }
 
+const STATUS_GLYPH = {
+  permission_prompt: '⚠️',
+  tool_error: '❗',
+  idle: '💤',
+  completed_turn: '✅',
+  running: '🔵',
+  notification: '🔔',
+}
+
 const NOTIFY_STATUSES = new Set(['permission_prompt', 'completed_turn', 'tool_error'])
+
+function focusTerminalApp(termProgram) {
+  const bundleId = BUNDLE_ID_BY_TERM_PROGRAM[termProgram]
+  if (!bundleId) return
+  execFile('open', ['-b', bundleId], (error) => {
+    if (error) console.error('无法唤起终端 App:', error)
+  })
+}
 
 function renderMenu() {
   const entries = Object.values(sessions)
@@ -25,16 +45,20 @@ function renderMenu() {
   const items = entries
     .slice()
     .sort((a, b) => b.updatedAt - a.updatedAt)
-    .map((session) => ({
-      label: `${session.projectName} — ${STATUS_LABEL[session.status] ?? session.status}`,
-      enabled: false,
-    }))
+    .map((session) => {
+      const bundleId = BUNDLE_ID_BY_TERM_PROGRAM[session.termProgram]
+      return {
+        label: `${session.projectName} — ${STATUS_LABEL[session.status] ?? session.status}`,
+        enabled: Boolean(bundleId),
+        click: bundleId ? () => focusTerminalApp(session.termProgram) : undefined,
+      }
+    })
   return Menu.buildFromTemplate(items)
 }
 
 function renderTrayTitle() {
   const status = aggregateStatus(sessions)
-  return status ? (STATUS_LABEL[status] ?? '●').slice(0, 2) : '●'
+  return status ? STATUS_GLYPH[status] ?? '●' : '●'
 }
 
 function refreshTray() {
@@ -58,7 +82,8 @@ function handleEvent(event) {
 
 app.whenReady().then(() => {
   app.dock?.hide()
-  tray = new Tray(nativeImage.createEmpty())
+  const icon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'tray-icon.png'))
+  tray = new Tray(icon)
   refreshTray()
   createEventServer(handleEvent).listen(PORT, '127.0.0.1')
 })

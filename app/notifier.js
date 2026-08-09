@@ -1,16 +1,22 @@
+const path = require('path')
 const notifier = require('node-notifier')
+const { BUNDLE_ID_BY_TERM_PROGRAM } = require('./terminalBundles')
 
-const BUNDLE_ID_BY_TERM_PROGRAM = {
-  Apple_Terminal: 'com.apple.Terminal',
-  'iTerm.app': 'com.googlecode.iterm2',
-  WarpTerminal: 'dev.warp.Warp-Stable',
-  vscode: 'com.microsoft.VSCode',
-}
+const CONTENT_IMAGE_PATH = path.join(__dirname, 'assets', 'tray-icon@2x.png')
 
 function sendSystemNotification({ title, message, termProgram }) {
-  const activate = BUNDLE_ID_BY_TERM_PROGRAM[termProgram]
+  const bundleId = BUNDLE_ID_BY_TERM_PROGRAM[termProgram]
   return new Promise((resolve) => {
-    notifier.notify({ title, message, sound: true, ...(activate ? { activate } : {}) }, () => resolve())
+    notifier.notify(
+      {
+        title,
+        message,
+        sound: true,
+        contentImage: CONTENT_IMAGE_PATH,
+        ...(bundleId ? { activate: bundleId } : {}),
+      },
+      () => resolve()
+    )
   })
 }
 

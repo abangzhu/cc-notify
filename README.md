@@ -6,18 +6,19 @@
 
 1. Claude Code 触发官方 hook 事件（`SessionStart`、`UserPromptSubmit`、`Notification`、`PostToolUse`、`Stop`、`SessionEnd`），执行 `hooks/notify.js`。
 2. `notify.js` 把事件映射成简化状态，POST 到本地 `127.0.0.1:47823`，由常驻的菜单栏程序（`app/main.js`，Electron）接收并更新 tray 图标/下拉菜单。
-3. 关键状态（等待审批 / 已完成一轮 / 工具出错）会额外弹一条系统通知；点击通知会把对应终端 App（Terminal / iTerm / Warp / VS Code，按会话启动时的 `$TERM_PROGRAM` 判断）带到前台——不做精确到窗口/tab 的跳转。
+3. 关键状态（等待审批 / 已完成一轮 / 工具出错）会额外弹一条系统通知；点击通知，或在下拉菜单里点击对应会话项，都会把对应终端 App（Terminal / iTerm / Warp / VS Code，按会话启动时的 `$TERM_PROGRAM` 判断）带到前台——不做精确到窗口/tab 的跳转。识别不出终端 App 的会话项不可点击。
 4. 如果菜单栏程序没在运行，`notify.js` 会直接兜底发一条系统通知，保证不会完全错过提醒。
 
 ## 安装
 
 ```bash
 cd cc-notify
-npm install
-./scripts/install.sh   # 生成 LaunchAgent，让菜单栏程序登录时自动启动
+npm run setup   # 自动安装依赖 + 生成 LaunchAgent，让菜单栏程序登录时自动启动
 ```
 
-安装后菜单栏会出现一个状态图标（●），点击可以看到当前所有 Claude Code 会话及其状态。
+`npm run setup` 内部会先检查依赖是否已安装，缺失时自动执行 `npm install`，再生成并加载 LaunchAgent，并校验加载是否成功。
+
+安装后菜单栏会出现 Clawd 图标（cc-notify 的吉祥物）+ 一个状态符号，点击图标可以看到当前所有 Claude Code 会话及其状态。
 
 卸载：`launchctl unload ~/Library/LaunchAgents/com.cc-notify.app.plist && rm ~/Library/LaunchAgents/com.cc-notify.app.plist`
 
