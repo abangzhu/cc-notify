@@ -58,8 +58,10 @@ function mapPayloadToEvent(payload, env = {}) {
       return { ...base, status, label: validated.title ?? '通知' }
     }
     case 'PostToolUse':
-      if (!toolResponseIsError(validated.tool_response)) return null
-      return { ...base, status: 'tool_error', label: `工具执行出错：${validated.tool_name ?? ''}` }
+      if (toolResponseIsError(validated.tool_response)) {
+        return { ...base, status: 'tool_error', label: `工具执行出错：${validated.tool_name ?? ''}` }
+      }
+      return { ...base, status: 'running', label: '工具执行完成' }
     case 'Stop':
       return { ...base, status: 'completed_turn', label: '已完成一轮' }
     case 'SessionEnd':

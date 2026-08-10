@@ -44,12 +44,12 @@ describe('mapPayloadToEvent', () => {
     expect(event.status).toBe('ended')
   })
 
-  it('ignores PostToolUse without error', () => {
+  it('maps PostToolUse without error to running', () => {
     const event = mapPayloadToEvent(
       { hook_event_name: 'PostToolUse', session_id: 's1', cwd: '/tmp/proj', tool_response: { ok: true } },
       env
     )
-    expect(event).toBeNull()
+    expect(event.status).toBe('running')
   })
 
   it('maps PostToolUse with error to tool_error', () => {

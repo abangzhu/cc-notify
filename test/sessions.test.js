@@ -33,6 +33,12 @@ describe('applyEvent', () => {
     expect(after.s1).toBeUndefined()
   })
 
+  it('clears a permission_prompt notification once approved and running again', () => {
+    const before = applyEvent({}, makeEvent({ status: 'permission_prompt', label: '等待权限审批' }))
+    const after = applyEvent(before, makeEvent({ status: 'running', label: '工具执行完成' }))
+    expect(after.s1.status).toBe('running')
+  })
+
   it('keeps other sessions untouched when one is removed', () => {
     const withTwo = applyEvent(
       applyEvent({}, makeEvent({ sessionId: 's1' })),
