@@ -26,11 +26,26 @@ npm run setup   # 自动安装依赖 + 生成 LaunchAgent，让菜单栏程序�
 
 ## 在 Claude Code 里启用插件
 
-本地测试（无需发布到 marketplace）：
+### 永久安装（推荐）
+
+注册为本地 marketplace 并安装，这样以后启动 `claude` 不需要任何额外参数，hooks 会一直自动注册：
+
+```bash
+claude plugin marketplace add /path/to/cc-notify
+claude plugin install cc-notify@cc-notify
+```
+
+用 `claude plugin list` 确认 `cc-notify@cc-notify` 状态是 `enabled`。
+
+卸载：`claude plugin uninstall cc-notify@cc-notify && claude plugin marketplace remove cc-notify`
+
+### 临时加载（单次会话，不推荐长期用）
 
 ```bash
 claude --plugin-dir /path/to/cc-notify
 ```
+
+注意：这种方式只在当次会话生效，忘记带这个参数启动 `claude` 时 hooks 不会注册，也就完全收不到通知——这是常见的"突然收不到通知"原因，跟插件代码本身无关。
 
 验证插件清单/hooks 配置：
 
