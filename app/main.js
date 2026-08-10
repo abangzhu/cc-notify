@@ -1,10 +1,10 @@
 const path = require('path')
-const { execFile } = require('child_process')
 const { app, Tray, Menu, nativeImage, globalShortcut } = require('electron')
 const { createEventServer, PORT } = require('./server')
 const { applyEvent, aggregateStatus } = require('./sessions')
 const { sendSystemNotification } = require('./notifier')
 const { BUNDLE_ID_BY_TERM_PROGRAM } = require('./terminalBundles')
+const { focusTerminalApp } = require('./focusTerminal')
 
 let sessions = {}
 let tray = null
@@ -20,14 +20,6 @@ const STATUS_LABEL = {
 
 const NOTIFY_STATUSES = new Set(['permission_prompt', 'completed_turn', 'tool_error'])
 const MENU_SHORTCUT = 'Control+Option+Command+C'
-
-function focusTerminalApp(termProgram) {
-  const bundleId = BUNDLE_ID_BY_TERM_PROGRAM[termProgram]
-  if (!bundleId) return
-  execFile('open', ['-b', bundleId], (error) => {
-    if (error) console.error('无法唤起终端 App:', error)
-  })
-}
 
 function renderMenu() {
   const entries = Object.values(sessions)
