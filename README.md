@@ -18,7 +18,9 @@ npm run setup   # 自动安装依赖 + 生成 LaunchAgent，让菜单栏程序�
 
 `npm run setup` 内部会先检查依赖是否已安装，缺失时自动执行 `npm install`，再生成并加载 LaunchAgent，并校验加载是否成功。
 
-安装后菜单栏会出现 Clawd 图标（cc-notify 的吉祥物）+ 一个状态符号，点击图标可以看到当前所有 Claude Code 会话及其状态。
+安装后菜单栏会出现 Clawd 图标（cc-notify 的吉祥物），点击图标可以看到当前所有 Claude Code 会话及其状态。
+
+如果菜单栏右侧图标太多，系统可能把新图标挤到不可见的区域（尤其是带摄像头刘海的机型）。此时可以按 `Control+Option+Command+C` 直接呼出会话列表菜单，不依赖图标是否可见；更彻底的办法是腾出菜单栏空间（拖动/隐藏其他图标，或用 [Ice](https://github.com/jordanbaird/Ice) 等菜单栏管理工具）。
 
 卸载：`launchctl unload ~/Library/LaunchAgents/com.cc-notify.app.plist && rm ~/Library/LaunchAgents/com.cc-notify.app.plist`
 
